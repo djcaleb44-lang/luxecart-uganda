@@ -117,6 +117,69 @@ const starterProducts = [
     image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80'
   },
   {
+    id: 27,
+    name: 'Armani-Inspired Two-Piece Suit',
+    category: 'clothes',
+    tag: 'Designer-inspired',
+    price: 195000,
+    rating: 4.8,
+    image: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    id: 28,
+    name: 'Gucci-Inspired Signature Tee',
+    category: 'clothes',
+    tag: 'Campus pick',
+    price: 55000,
+    rating: 4.7,
+    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    id: 29,
+    name: 'Louis Vuitton-Inspired Print Jacket',
+    category: 'clothes',
+    tag: 'Designer-inspired',
+    price: 110000,
+    rating: 4.7,
+    image: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    id: 30,
+    name: 'Calvin Klein-Inspired Minimal Hoodie',
+    category: 'clothes',
+    tag: 'Teen pick',
+    price: 75000,
+    rating: 4.8,
+    image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    id: 31,
+    name: 'Straight-Leg Denim Jeans',
+    category: 'clothes',
+    tag: 'Campus pick',
+    price: 65000,
+    rating: 4.8,
+    image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    id: 32,
+    name: "Women's Kampala Occasion Dress",
+    category: 'clothes',
+    tag: "Ladies' edit",
+    price: 105000,
+    rating: 4.9,
+    image: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    id: 33,
+    name: "Women's Tailored Blazer Set",
+    category: 'clothes',
+    tag: 'Workwear',
+    price: 145000,
+    rating: 4.8,
+    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80'
+  },
+  {
     id: 7,
     name: 'Masaka Barkcloth Artisan Craft',
     category: 'crafts',
@@ -503,6 +566,7 @@ function setActiveCategoryTab(selectedTab) {
   });
   productGrid.setAttribute('aria-labelledby', selectedTab.id);
   document.getElementById('foodMenuNote').hidden = selectedTab.dataset.filter !== 'food';
+  document.getElementById('clothingMenuNote').hidden = selectedTab.dataset.filter !== 'clothes';
 }
 
 function activateCategoryTab(selectedTab) {
