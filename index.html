@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en-UG">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LuxeCart Uganda | Kampala fashion and tech</title>
+    <meta name="description" content="Shop Kampala fashion, bags, accessories and tech, or list your own products on LuxeCart Uganda." />
+    <meta name="theme-color" content="#ed7027" />
+    <meta property="og:title" content="LuxeCart Uganda | Kampala fashion and tech" />
+    <meta property="og:description" content="Discover Kampala fashion, affordable bags, accessories, tech and local goods." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Eguana_Kampala_SS_15_campaign.JPG/960px-Eguana_Kampala_SS_15_campaign.JPG" />
+    <meta property="og:image:alt" content="Contemporary Ugandan kitenge designs by Eguana Kampala" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <div class="brand-mark">L</div>
+          <div>
+            <span class="brand-name">LuxeCart Uganda</span>
+          </div>
+        </div>
+
+        <nav class="nav-links" aria-label="Primary navigation">
+          <a href="#catalog" data-nav-filter="all">Discover</a>
+          <a href="#catalog" data-nav-filter="clothes">Clothing</a>
+          <a href="#catalog" data-nav-filter="bags">Bags</a>
+          <a href="#catalog" data-nav-filter="electronics">Tech</a>
+          <a href="#catalog" data-nav-filter="accessories">Accessories</a>
+          <a href="#catalog" data-nav-filter="crafts">Crafts</a>
+          <a href="#catalog" data-nav-filter="food">Food</a>
+        </nav>
+
+        <div class="header-actions">
+          <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <input id="searchInput" type="search" placeholder="Search the marketplace" aria-label="Search products" />
+          </label>
+          <button class="icon-btn favorites-toggle" id="favoritesToggle" aria-label="Show favorites" title="Show favorites">♡</button>
+          <button class="inbox-btn" id="openInbox" aria-label="Open messages">Messages</button>
+          <button class="account-btn" id="openAccount">Create account</button>
+          <button class="sell-btn" id="openListing">＋ <span>Sell an item</span></button>
+          <button class="cart-btn" aria-label="Shopping cart">
+            Bag <span id="cartCount">0</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <section class="hero">
+          <div class="hero-copy">
+            <span class="pill">Kampala designers, all in one market</span>
+            <h1>Find your next <em>everyday</em> favorite.</h1>
+            <p>
+              Shop statement kitenge, campus-ready bags and everyday tech from sellers across Uganda.
+              Have something to sell? Put your collection in front of new customers.
+            </p>
+            <div class="hero-actions">
+              <a class="primary-btn" href="#catalog">Explore the market <span aria-hidden="true">↘</span></a>
+              <button class="secondary-btn" id="heroSell">Start selling</button>
+            </div>
+            <div class="hero-stats">
+              <div>
+                <strong>Campus picks</strong>
+                <span>style, bags and tech</span>
+              </div>
+              <div>
+                <strong>UGX prices</strong>
+                <span>from local sellers</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <div class="product-showcase">
+              <div class="showcase-card large">
+                <span class="mini-tag">Eguana Kampala</span>
+                <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Eguana_Kampala_SS_15_campaign.JPG/960px-Eguana_Kampala_SS_15_campaign.JPG" alt="Eguana Kampala contemporary kitenge suit collection" />
+              </div>
+              <div class="showcase-card small">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/f0/Prints_over_Kampala.jpg" alt="Contemporary Ugandan printed outfits photographed in Kampala" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="category-strip" role="tablist" aria-label="Product categories">
+          <button class="category active" id="tab-everything" role="tab" aria-selected="true" aria-controls="productGrid" tabindex="0" data-filter="all">Everything</button>
+          <button class="category" id="tab-clothing" role="tab" aria-selected="false" aria-controls="productGrid" tabindex="-1" data-filter="clothes">Clothing</button>
+          <button class="category" id="tab-bags" role="tab" aria-selected="false" aria-controls="productGrid" tabindex="-1" data-filter="bags">Bags</button>
+          <button class="category" id="tab-tech" role="tab" aria-selected="false" aria-controls="productGrid" tabindex="-1" data-filter="electronics">Tech</button>
+          <button class="category" id="tab-accessories" role="tab" aria-selected="false" aria-controls="productGrid" tabindex="-1" data-filter="accessories">Accessories</button>
+          <button class="category" id="tab-crafts" role="tab" aria-selected="false" aria-controls="productGrid" tabindex="-1" data-filter="crafts">Crafts</button>
+          <button class="category" id="tab-food" role="tab" aria-selected="false" aria-controls="productGrid" tabindex="-1" data-filter="food">Food &amp; coffee</button>
+          <button class="category" id="tab-trending" role="tab" aria-selected="false" aria-controls="productGrid" tabindex="-1" data-filter="featured">Trending</button>
+        </section>
+
+        <section class="featured-row">
+          <article class="feature-card">
+            <span>Food orders</span>
+            <strong>Free delivery around Kampala</strong>
+          </article>
+          <article class="feature-card accent">
+            <span>Campus edit</span>
+            <strong>Fresh style and everyday tech</strong>
+          </article>
+          <article class="feature-card">
+            <span>Ugandan shillings</span>
+            <strong>Prices in UGX</strong>
+          </article>
+        </section>
+
+        <section id="catalog" class="catalog-header">
+          <div>
+            <p class="eyebrow">Picked from sellers across Uganda</p>
+            <h2>Find something local</h2>
+          </div>
+          <span id="resultCount" class="result-count"></span>
+        </section>
+
+        <section id="productGrid" class="product-grid" role="tabpanel" aria-labelledby="tab-everything" aria-live="polite" tabindex="0"></section>
+        <p class="food-menu-note" id="foodMenuNote" hidden>Restaurant-inspired sample listings; not official KFC or Cafe Javas menus. Food-only orders have free delivery around Kampala.</p>
+      </main>
+      <footer class="site-footer">
+        <p>Fashion photos by <a href="https://commons.wikimedia.org/wiki/File:Eguana_Kampala_SS_15_campaign.JPG" target="_blank" rel="noreferrer">Eguanakla</a> and <a href="https://commons.wikimedia.org/wiki/File:Kitengi_dress_on_display.JPG" target="_blank" rel="noreferrer">Faintsmoke</a>; coffee by <a href="https://commons.wikimedia.org/wiki/File:Coffee_beans_in_a_farmer%27s_hands.jpg" target="_blank" rel="noreferrer">Jameswasswa</a>; barkcloth by <a href="https://commons.wikimedia.org/wiki/File:Back_cloth_preparation_from_a_fig_tree_in_Uganda_09.jpg" target="_blank" rel="noreferrer">Joyce Nanjobe Kawooya</a>. CC BY-SA 4.0.</p>
+      </footer>
+
+      <dialog class="listing-dialog" id="listingDialog" aria-labelledby="listingTitle">
+        <form id="listingForm" class="listing-form">
+          <div class="dialog-heading">
+            <div>
+              <p class="eyebrow">Your shop starts here</p>
+              <h2 id="listingTitle">List a product</h2>
+            </div>
+            <button class="close-btn" id="closeListing" type="button" aria-label="Close listing form">×</button>
+          </div>
+          <label>Product name<input name="name" required maxlength="60" placeholder="e.g. Kampala kitenge set" /></label>
+          <div class="form-row">
+            <label>Category<select name="category" required><option value="clothes">Clothing</option><option value="bags">Bags</option><option value="electronics">Electronics</option><option value="accessories">Accessories</option><option value="crafts">Crafts</option><option value="food">Food &amp; coffee</option></select></label>
+            <label>Price (UGX)<input name="price" type="number" min="1000" max="999999999" step="500" required placeholder="85000" /></label>
+          </div>
+          <label>Shop or seller name<input name="seller" required maxlength="40" placeholder="Your shop name" /></label>
+          <label>Product photo URL<input name="image" type="url" placeholder="https://example.com/product.jpg" /></label>
+          <label class="upload-field">Or choose a photo<input name="photo" type="file" accept="image/*" /></label>
+          <p class="form-note">Enter your price in Ugandan shillings. Listings are saved in this browser only.</p>
+          <button class="primary-btn submit-listing" type="submit">Publish listing <span aria-hidden="true">↗</span></button>
+        </form>
+      </dialog>
+      <dialog class="account-dialog" id="accountDialog" aria-labelledby="accountTitle">
+        <form id="accountForm" class="listing-form">
+          <div class="dialog-heading">
+            <div>
+              <p class="eyebrow">A better way to shop small</p>
+              <h2 id="accountTitle">Join LuxeCart</h2>
+            </div>
+            <button class="close-btn" id="closeAccount" type="button" aria-label="Close account form">×</button>
+          </div>
+          <div class="account-tabs" role="tablist" aria-label="Account access">
+            <button class="account-tab active" type="button" data-account-mode="register" role="tab" aria-selected="true">Create account</button>
+            <button class="account-tab" type="button" data-account-mode="login" role="tab" aria-selected="false">Sign in</button>
+          </div>
+          <label id="accountNameField">Your name<input name="name" required maxlength="40" autocomplete="name" placeholder="Name for your shop" /></label>
+          <label>Email address<input name="email" type="email" required autocomplete="email" placeholder="you@example.com" /></label>
+          <label>Password<input name="password" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters" /></label>
+          <p class="form-note">Demo account data stays in this browser. A live marketplace needs secure server-side accounts.</p>
+          <button class="primary-btn submit-listing" id="accountSubmit" type="submit">Create my account <span aria-hidden="true">↗</span></button>
+        </form>
+      </dialog>
+      <aside class="messages-panel hidden" id="messagesPanel" aria-label="Messages">
+        <div class="messages-header">
+          <div>
+            <p class="eyebrow">Your conversations</p>
+            <h2>Messages</h2>
+          </div>
+          <button class="close-btn" id="closeInbox" type="button" aria-label="Close messages">×</button>
+        </div>
+        <div class="messages-content">
+          <div class="conversation-list" id="conversationList" aria-label="Conversation list"></div>
+          <section class="conversation-view" id="conversationView" aria-label="Conversation">
+            <div class="conversation-empty" id="conversationEmpty">Choose a conversation or message a seller from a product.</div>
+            <div class="conversation-active hidden" id="conversationActive">
+              <div class="conversation-title" id="conversationTitle"></div>
+              <div class="message-thread" id="messageThread" aria-live="polite"></div>
+              <form class="message-composer" id="messageForm">
+                <label class="visually-hidden" for="messageInput">Write a message</label>
+                <input id="messageInput" name="message" maxlength="1000" required placeholder="Write a message…" autocomplete="off" />
+                <button class="primary-btn" type="submit" aria-label="Send message">Send</button>
+              </form>
+            </div>
+          </section>
+        </div>
+        <p class="form-note messages-note">Messages are saved in this browser for this demo.</p>
+      </aside>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+      <aside class="cart-panel hidden" id="cartPanel" aria-label="Shopping cart">
+        <div class="cart-header">
+          <div>
+            <p class="eyebrow light">Your bag</p>
+            <h3>Cart</h3>
+          </div>
+          <button class="close-btn" aria-label="Close cart">×</button>
+        </div>
+
+        <div id="cartItems" class="cart-items"></div>
+
+        <div class="cart-summary">
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <strong id="subtotal">UGX 0</strong>
+          </div>
+          <div class="summary-row">
+            <span>Delivery</span>
+            <strong id="deliveryFee">UGX 8,000</strong>
+          </div>
+          <div class="summary-row total">
+            <span>Total</span>
+            <strong id="total">UGX 8,000</strong>
+          </div>
+          <button class="checkout-btn">Proceed to checkout</button>
+        </div>
+      </aside>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
