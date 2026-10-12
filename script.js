@@ -1,12 +1,12 @@
 const starterProducts = [
   {
     id: 1,
-    name: 'Eguana Kampala Blue Suit and Print Dress',
+    name: 'Kampala Graphic Print T-Shirt',
     category: 'clothes',
     tag: 'Featured',
-    price: 275000,
+    price: 65000,
     rating: 4.9,
-    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Eguana_Kampala_SS_15_campaign.JPG/960px-Eguana_Kampala_SS_15_campaign.JPG'
+    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=900&q=80'
   },
   {
     id: 2,
@@ -15,7 +15,7 @@ const starterProducts = [
     tag: 'Designer label',
     price: 180000,
     rating: 4.8,
-    image: 'https://upload.wikimedia.org/wikipedia/commons/7/76/Eguana_Kampala_ss15_lookbook.jpg'
+    image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=900&q=80'
   },
   {
     id: 3,
@@ -37,12 +37,12 @@ const starterProducts = [
   },
   {
     id: 5,
-    name: 'Eguana Kampala Occasion Dress',
+    name: 'Oversized Kampala Streetwear T-Shirt',
     category: 'clothes',
-    tag: 'Occasionwear',
-    price: 225000,
+    tag: 'Teen pick',
+    price: 68000,
     rating: 4.8,
-    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Fly_like_a_bird_Eguana_Kampala_ss_15_lookbook.jpg/960px-Fly_like_a_bird_Eguana_Kampala_ss_15_lookbook.jpg'
+    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80'
   },
   {
     id: 6,
@@ -277,6 +277,15 @@ const starterProducts = [
     price: 35000,
     rating: 4.7,
     image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    id: 34,
+    name: 'Classic Leather Belt',
+    category: 'accessories',
+    tag: 'Everyday accessory',
+    price: 45000,
+    rating: 4.7,
+    image: 'https://images.unsplash.com/photo-1664286074176-5206ee5dc878?auto=format&fit=crop&w=900&q=80'
   },
   {
     id: 25,
