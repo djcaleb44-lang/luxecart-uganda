@@ -326,6 +326,17 @@ let currentUser = loadCurrentUser();
 let accountMode = 'register';
 let conversations = loadConversations();
 let activeConversationId = null;
+let pendingMessageFiles = [];
+let pendingPreviewUrls = [];
+let messageObjectUrls = [];
+let voiceRecorder = null;
+let voiceStream = null;
+let voiceChunks = [];
+let voiceStopTimer = null;
+const messageMediaDatabase = 'luxecart-message-media';
+const maxMessageFileBytes = 8 * 1024 * 1024;
+const maxMessageAttachments = 4;
+const maxMessageAttachmentsBytes = 20 * 1024 * 1024;
 const filters = document.querySelectorAll('.category');
 const productGrid = document.getElementById('productGrid');
 const cartCount = document.getElementById('cartCount');
@@ -398,6 +409,55 @@ function saveConversations() {
   } catch {
     showToast('Could not save this conversation in browser storage');
   }
+}
+
+function openMessageMediaDatabase() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(messageMediaDatabase, 1);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains('attachments')) {
+        request.result.createObjectStore('attachments', { keyPath: 'id' });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function storeMessageMedia(file) {
+  const database = await openMessageMediaDatabase();
+  const id = crypto.randomUUID ? crypto.randomUUID() : `media-${Date.now()}-${Math.random()}`;
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction('attachments', 'readwrite');
+    transaction.objectStore('attachments').put({ id, blob: file, name: file.name, type: file.type });
+    transaction.oncomplete = () => {
+      database.close();
+      resolve({ id, name: file.name, type: file.type });
+    };
+    transaction.onerror = () => {
+      database.close();
+      reject(transaction.error);
+    };
+    transaction.onabort = () => {
+      database.close();
+      reject(transaction.error || new Error('Media storage was interrupted'));
+    };
+  });
+}
+
+async function loadMessageMedia(id) {
+  const database = await openMessageMediaDatabase();
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction('attachments', 'readonly');
+    const request = transaction.objectStore('attachments').get(id);
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => database.close();
+    transaction.onerror = () => {
+      database.close();
+      reject(transaction.error);
+    };
+  });
 }
 
 function loadSellerProducts() {
@@ -490,7 +550,7 @@ function renderProducts() {
                 <div class="rating">★ ${product.rating}</div>
               </div>
               <div class="product-actions">
-                <button class="add-btn" data-id="${escapeHTML(product.id)}">Add to bag</button>
+                <button class="add-btn" data-id="${escapeHTML(product.id)}">Place your order</button>
                 ${product.seller && currentUser && product.seller.toLowerCase() === currentUser.name.toLowerCase() ? '' : `<button class="message-seller" data-message-id="${escapeHTML(product.id)}" aria-label="Message ${escapeHTML(product.seller || 'seller')} about ${escapeHTML(product.name)}">Message seller</button>`}
               </div>
             </div>
@@ -789,17 +849,21 @@ function renderConversations() {
   }
   list.innerHTML = [...visible]
     .sort((first, second) => second.updatedAt - first.updatedAt)
-    .map((item) => `
-      <button class="conversation-item ${item.id === activeConversationId ? 'active' : ''}" type="button" data-conversation-id="${escapeHTML(item.id)}">
+    .map((item) => {
+      const lastMessage = item.messages.at(-1);
+      const preview = lastMessage?.text || (lastMessage?.attachments?.length ? 'Photo, video, or voice message' : 'Start a conversation');
+      return `
+        <button class="conversation-item ${item.id === activeConversationId ? 'active' : ''}" type="button" data-conversation-id="${escapeHTML(item.id)}">
           <strong>${escapeHTML(item.buyerEmail === currentUser.email ? item.seller : item.buyerName)}</strong>
-        <span>${escapeHTML(item.productName)}</span>
-        <small>${escapeHTML(item.messages.at(-1)?.text || 'Start a conversation')}</small>
-      </button>
-    `)
+          <span>${escapeHTML(item.productName)}</span>
+          <small>${escapeHTML(preview)}</small>
+        </button>
+      `;
+    })
     .join('');
 }
 
-function renderActiveConversation() {
+async function renderActiveConversation() {
   const conversation = conversations.find((item) => item.id === activeConversationId
     && (item.buyerEmail === currentUser?.email || item.sellerEmail === currentUser?.email));
   const empty = document.getElementById('conversationEmpty');
@@ -810,10 +874,62 @@ function renderActiveConversation() {
 
   const partner = conversation.buyerEmail === currentUser.email ? conversation.seller : conversation.buyerName;
   document.getElementById('conversationTitle').textContent = `${partner} · ${conversation.productName}`;
-  document.getElementById('messageThread').innerHTML = conversation.messages
-    .map((message) => `<p class="message-bubble ${message.senderEmail === currentUser.email ? 'sent' : 'received'}"><strong>${escapeHTML(message.senderName)}</strong>${escapeHTML(message.text)}<time>${escapeHTML(new Date(message.time).toLocaleString())}</time></p>`)
-    .join('');
-  document.getElementById('messageThread').scrollTop = document.getElementById('messageThread').scrollHeight;
+  const thread = document.getElementById('messageThread');
+  messageObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+  messageObjectUrls = [];
+  thread.replaceChildren();
+
+  for (const message of conversation.messages) {
+    const bubble = document.createElement('article');
+    bubble.className = `message-bubble ${message.senderEmail === currentUser.email ? 'sent' : 'received'}`;
+    const sender = document.createElement('strong');
+    sender.textContent = message.senderName;
+    bubble.append(sender);
+
+    if (message.text) {
+      const text = document.createElement('p');
+      text.className = 'message-text';
+      text.textContent = message.text;
+      bubble.append(text);
+    }
+
+    for (const attachment of message.attachments || []) {
+      try {
+        const stored = await loadMessageMedia(attachment.id);
+        if (!stored) continue;
+        const source = URL.createObjectURL(stored.blob);
+        messageObjectUrls.push(source);
+        let media;
+        if (stored.type.startsWith('video/')) {
+          media = document.createElement('video');
+          media.controls = true;
+          media.playsInline = true;
+          media.preload = 'metadata';
+        } else if (stored.type.startsWith('audio/')) {
+          media = document.createElement('audio');
+          media.controls = true;
+        } else {
+          media = document.createElement('img');
+          media.alt = stored.name;
+        }
+        media.className = 'message-media';
+        media.src = source;
+        const attachmentBlock = document.createElement('div');
+        attachmentBlock.className = 'message-attachment';
+        attachmentBlock.append(media);
+        bubble.append(attachmentBlock);
+      } catch {
+        showToast('Could not load a saved message attachment');
+      }
+    }
+
+    const time = document.createElement('time');
+    time.textContent = new Date(message.time).toLocaleString();
+    bubble.append(time);
+    thread.append(bubble);
+  }
+
+  thread.scrollTop = thread.scrollHeight;
 }
 
 document.getElementById('openInbox').addEventListener('click', () => {
@@ -823,7 +939,10 @@ document.getElementById('openInbox').addEventListener('click', () => {
   renderActiveConversation();
   messagesPanel.classList.remove('hidden');
 });
-document.getElementById('closeInbox').addEventListener('click', () => messagesPanel.classList.add('hidden'));
+document.getElementById('closeInbox').addEventListener('click', () => {
+  stopVoiceRecording();
+  messagesPanel.classList.add('hidden');
+});
 document.getElementById('conversationList').addEventListener('click', (event) => {
   const item = event.target.closest('[data-conversation-id]');
   if (!item) return;
@@ -831,24 +950,158 @@ document.getElementById('conversationList').addEventListener('click', (event) =>
   renderConversations();
   renderActiveConversation();
 });
-document.getElementById('messageForm').addEventListener('submit', (event) => {
+function renderPendingMessageFiles() {
+  pendingPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+  pendingPreviewUrls = [];
+  const preview = document.getElementById('messageAttachmentPreview');
+  preview.replaceChildren();
+  preview.classList.toggle('hidden', pendingMessageFiles.length === 0);
+
+  pendingMessageFiles.forEach((file, index) => {
+    const item = document.createElement('div');
+    item.className = 'attachment-preview-item';
+    const source = URL.createObjectURL(file);
+    pendingPreviewUrls.push(source);
+    if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+      const media = file.type.startsWith('video/') ? document.createElement('video') : document.createElement('img');
+      media.src = source;
+      if (media instanceof HTMLImageElement) media.alt = file.name;
+      if (media instanceof HTMLVideoElement) {
+        media.muted = true;
+        media.playsInline = true;
+        media.preload = 'metadata';
+      }
+      item.append(media);
+    }
+    const name = document.createElement('span');
+    name.textContent = file.type.startsWith('audio/') ? `Voice: ${file.name}` : file.name;
+    const remove = document.createElement('button');
+    remove.className = 'attachment-remove';
+    remove.type = 'button';
+    remove.dataset.removeAttachment = String(index);
+    remove.setAttribute('aria-label', `Remove ${file.name}`);
+    remove.textContent = '×';
+    item.append(name, remove);
+    preview.append(item);
+  });
+}
+
+function addPendingMessageFiles(files) {
+  let rejected = 0;
+  for (const file of files) {
+    const supported = file.type.startsWith('image/') || file.type.startsWith('video/') || file.type.startsWith('audio/');
+    const pendingSize = pendingMessageFiles.reduce((sum, item) => sum + item.size, 0);
+    if (!supported || file.size > maxMessageFileBytes || pendingMessageFiles.length >= maxMessageAttachments
+      || pendingSize + file.size > maxMessageAttachmentsBytes) {
+      rejected += 1;
+      continue;
+    }
+    pendingMessageFiles.push(file);
+  }
+  if (rejected) showToast('Attachments must be photos, videos, or audio, under 8 MB each (4 files max)');
+  renderPendingMessageFiles();
+}
+
+document.getElementById('attachMediaButton').addEventListener('click', () => document.getElementById('messageFiles').click());
+document.getElementById('messageFiles').addEventListener('change', (event) => {
+  addPendingMessageFiles(Array.from(event.target.files || []));
+  event.target.value = '';
+});
+document.getElementById('messageAttachmentPreview').addEventListener('click', (event) => {
+  const remove = event.target.closest('[data-remove-attachment]');
+  if (!remove) return;
+  pendingMessageFiles.splice(Number(remove.dataset.removeAttachment), 1);
+  renderPendingMessageFiles();
+});
+
+function stopVoiceRecording() {
+  if (voiceStopTimer) window.clearTimeout(voiceStopTimer);
+  voiceStopTimer = null;
+  if (voiceRecorder?.state === 'recording') voiceRecorder.stop();
+}
+
+async function toggleVoiceRecording() {
+  const button = document.getElementById('voiceRecordButton');
+  const status = document.getElementById('recordingStatus');
+  if (voiceRecorder?.state === 'recording') {
+    stopVoiceRecording();
+    button.textContent = 'Record voice';
+    button.setAttribute('aria-pressed', 'false');
+    status.textContent = 'Saving voice note…';
+    return;
+  }
+
+  if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+    showToast('Voice recording needs microphone access in a modern browser');
+    return;
+  }
+
+  try {
+    voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    voiceChunks = [];
+    const mimeType = typeof MediaRecorder.isTypeSupported === 'function'
+      && MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+      ? 'audio/webm;codecs=opus'
+      : '';
+    voiceRecorder = new MediaRecorder(voiceStream, mimeType ? { mimeType } : undefined);
+    voiceRecorder.addEventListener('dataavailable', (event) => {
+      if (event.data.size) voiceChunks.push(event.data);
+    });
+    voiceRecorder.addEventListener('stop', () => {
+      const type = voiceRecorder?.mimeType || voiceChunks[0]?.type || 'audio/webm';
+      const blob = new Blob(voiceChunks, { type });
+      voiceStream?.getTracks().forEach((track) => track.stop());
+      voiceStream = null;
+      voiceRecorder = null;
+      button.textContent = 'Record voice';
+      button.setAttribute('aria-pressed', 'false');
+      status.textContent = '';
+      if (blob.size) addPendingMessageFiles([new File([blob], `voice-note-${Date.now()}.webm`, { type })]);
+    }, { once: true });
+    voiceRecorder.start();
+    button.textContent = 'Stop recording';
+    button.setAttribute('aria-pressed', 'true');
+    status.textContent = 'Recording (60 sec max)';
+    voiceStopTimer = window.setTimeout(stopVoiceRecording, 60000);
+  } catch {
+    voiceStream?.getTracks().forEach((track) => track.stop());
+    voiceStream = null;
+    showToast('Microphone permission was not available');
+  }
+}
+
+document.getElementById('voiceRecordButton').addEventListener('click', toggleVoiceRecording);
+
+document.getElementById('messageForm').addEventListener('submit', async (event) => {
   event.preventDefault();
     const conversation = conversations.find((item) => item.id === activeConversationId
       && (item.buyerEmail === currentUser?.email || item.sellerEmail === currentUser?.email));
   const input = document.getElementById('messageInput');
   const text = input.value.trim();
-  if (!conversation || !text) return;
-    conversation.messages.push({ text, senderEmail: currentUser.email, senderName: currentUser.name, time: Date.now() });
+  if (!conversation || (!text && !pendingMessageFiles.length)) return;
+
+  try {
+    const attachments = [];
+    for (const file of pendingMessageFiles) attachments.push(await storeMessageMedia(file));
+    conversation.messages.push({ text, attachments, senderEmail: currentUser.email, senderName: currentUser.name, time: Date.now() });
+  } catch {
+    showToast('Could not save attachments in this browser');
+    return;
+  }
+
   conversation.updatedAt = Date.now();
   saveConversations();
   input.value = '';
+  pendingMessageFiles = [];
+  renderPendingMessageFiles();
   renderConversations();
-  renderActiveConversation();
+  await renderActiveConversation();
 });
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     cartPanel.classList.add('hidden');
+    stopVoiceRecording();
     messagesPanel.classList.add('hidden');
   }
 });

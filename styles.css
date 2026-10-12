@@ -942,6 +942,11 @@ button {
   font-size: 0.72rem;
 }
 
+.message-text {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
 .message-bubble.received {
   align-self: flex-start;
   border-radius: 14px 14px 14px 3px;
@@ -949,10 +954,116 @@ button {
 }
 
 .message-composer {
-  display: flex;
-  gap: 8px;
+  display: grid;
+  gap: 10px;
   padding: 12px;
   border-top: 1px solid var(--line);
+}
+
+.composer-tools,
+.composer-send-row,
+.message-attachment-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.composer-tools {
+  flex-wrap: wrap;
+}
+
+.composer-tool {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 0.5rem 0.7rem;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.composer-tool[aria-pressed="true"] {
+  border-color: var(--primary);
+  background: #fff0e4;
+  color: var(--primary-deep);
+}
+
+.recording-status {
+  color: var(--primary-deep);
+  font-size: 0.78rem;
+}
+
+.message-attachment-preview {
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+.message-attachment-preview.hidden {
+  display: none;
+}
+
+.attachment-preview-item {
+  position: relative;
+  display: grid;
+  flex: 0 0 100px;
+  gap: 4px;
+  font-size: 0.68rem;
+}
+
+.attachment-preview-item img,
+.attachment-preview-item video {
+  width: 100px;
+  height: 72px;
+  border-radius: 7px;
+  background: #f3f0ed;
+  object-fit: cover;
+}
+
+.attachment-preview-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-remove {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  cursor: pointer;
+}
+
+.composer-send-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.message-attachment {
+  display: block;
+  max-width: 100%;
+  margin-top: 8px;
+}
+
+.message-attachment img,
+.message-attachment video {
+  display: block;
+  width: min(100%, 360px);
+  max-height: 280px;
+  border-radius: 9px;
+  background: #f3f0ed;
+  object-fit: contain;
+}
+
+.message-attachment audio {
+  display: block;
+  width: min(100%, 320px);
 }
 
 .message-composer .primary-btn {

@@ -191,14 +191,23 @@
               <div class="conversation-title" id="conversationTitle"></div>
               <div class="message-thread" id="messageThread" aria-live="polite"></div>
               <form class="message-composer" id="messageForm">
-                <label class="visually-hidden" for="messageInput">Write a message</label>
-                <input id="messageInput" name="message" maxlength="1000" required placeholder="Write a message…" autocomplete="off" />
-                <button class="primary-btn" type="submit" aria-label="Send message">Send</button>
+                <div class="composer-tools">
+                  <button class="composer-tool" id="attachMediaButton" type="button" aria-label="Attach photos or videos">＋ Photo/video</button>
+                  <input class="visually-hidden" id="messageFiles" type="file" accept="image/*,video/*" multiple />
+                  <button class="composer-tool" id="voiceRecordButton" type="button" aria-pressed="false">Record voice</button>
+                  <span id="recordingStatus" class="recording-status" aria-live="polite"></span>
+                </div>
+                <div id="messageAttachmentPreview" class="message-attachment-preview hidden" aria-live="polite"></div>
+                <div class="composer-send-row">
+                  <label class="visually-hidden" for="messageInput">Write a message</label>
+                  <input id="messageInput" name="message" maxlength="1000" placeholder="Write a message…" autocomplete="off" />
+                  <button class="primary-btn" type="submit" aria-label="Send message">Send</button>
+                </div>
               </form>
             </div>
           </section>
         </div>
-        <p class="form-note messages-note">Messages are saved in this browser for this demo.</p>
+        <p class="form-note messages-note">Text and attachments are saved in this browser for this demo.</p>
       </aside>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -231,6 +240,6 @@
       </aside>
     </div>
 
-    <script src="script.js?v=20261012-tees-belts"></script>
+    <script src="script.js?v=20261012-chat-media-order"></script>
   </body>
 </html>
